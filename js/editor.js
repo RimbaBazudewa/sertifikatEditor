@@ -158,6 +158,7 @@ class Editor {
 
 	}
 
+
 	//add text 
 	newText() {
 		let idx = this.children.length;
@@ -621,6 +622,9 @@ class Editor {
 	}
 	findChildObject(id) {
 		return this.children.find(c => c.id == id);
+	}
+	findChildObjectByName(name) {
+		return this.children.find(c => c.name == name);
 	}
 
 	removeChildObject(id) {
