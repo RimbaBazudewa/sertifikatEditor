@@ -110,7 +110,7 @@ class Editor {
 		}.bind(this));
 
 		this.canvas.on('text:changed', function () {
-			checkObject();
+			this.update();
 		}.bind(this))
 		this.canvas.on("object:added", function () {
 			this.generateChildObject()
@@ -645,6 +645,7 @@ class Editor {
 			this.canvas.discardActiveObject();
 			this.canvas.setActiveObject(ch);
 			this.canvas.requestRenderAll();
+			this.update();
 		}
 	}
 
