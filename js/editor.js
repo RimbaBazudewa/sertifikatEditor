@@ -173,12 +173,21 @@ class Editor {
 		this.addBackground(path);
 	}
 	//local add text using parameter index , idx is id of text can't be same with other 
-	addText(idx, left, top, name, canMove = true) {
-		var text = new fabric.IText('input text here', {
+	addText(idx, left, top, name, canMove = true, textInput = "input text here", fontSize = 40, fontFamily = "arial", textAlign = "left", bold = "normal", italic = "italic", underline = false, scalex = 1, scaley = 1) {
+		var text = new fabric.IText(textInput, {
 			left: left,
 			top: top,
 			id: idx,
-			selectable: canMove
+			selectable: canMove,
+			fontSize: fontSize,
+			fontFamily: fontFamily,
+			textAlign: textAlign,
+			fontWeight: bold,
+			fontStyle: italic,
+			underline: underline,
+			scaleX: scalex,
+			scaleY: scaley,
+
 
 		});
 		text.name = name;
@@ -186,12 +195,14 @@ class Editor {
 		this.canvas.add(text);
 	}
 	//local add image using parameter index and path , idx is id of text can't be same with other , path is path directory of image
-	addImage(idx, path, left, top, name, canMove = true) {
+	addImage(idx, path, left, top, name, canMove = true, scalex = 1, scaley = 1) {
 		fabric.Image.fromURL(path, function (oImg) {
 			oImg.left = left;
 			oImg.top = top;
 			oImg.name = name;
 			oImg.id = idx;
+			oImg.scaleX = scalex;
+			oImg.scaleY = scaley;
 			oImg.selectable = canMove;
 			this.children.push(oImg);
 			this.canvas.add(oImg);
@@ -315,7 +326,8 @@ class Editor {
 		this.setOnChangeComponent(component, FONT_FAMILY, function (e) {
 			//e.target.value to get value change 
 			if (this.currentActiveObject) {
-				this.currentActiveObject.fontFamilly = e.target.value;
+				console.log(e.target.value);
+				this.currentActiveObject.fontFamily = e.target.value;
 				this.canvas.renderAll();
 			}
 		}.bind(this))
@@ -382,37 +394,53 @@ class Editor {
 
 	//update componnet value if objet image is changing
 	updateObjectToImageComponent(Object) {
-		this.imageComonent.name.value = Object.name;
-		this.imageComonent.position.x.value = Object.left - this.parent.left;
-		this.imageComonent.position.y.value = Object.top - this.parent.top;
-		this.imageComonent.scale.x.value = Object.scaleX;
-		this.imageComonent.scale.y.value = Object.scaleY;
+		if (this.imageComonent.name)
+			this.imageComonent.name.value = Object.name;
+		if (this.imageComonent.position.x)
+			this.imageComonent.position.x.value = Object.left - this.parent.left;
+		if (this.imageComonent.position.y)
+			this.imageComonent.position.y.value = Object.top - this.parent.top;
+		if (this.imageComonent.scale.x)
+			this.imageComonent.scale.x.value = Object.scaleX;
+		if (this.imageComonent.scale.y)
+			this.imageComonent.scale.y.value = Object.scaleY;
 	}
 	//update componnet value if objet text is changing
 	updateObjectToTextComponent(Object) {
-		this.iTextComponent.name.value = Object.name;
-		this.iTextComponent.position.x.value = Object.left - this.parent.left;
-		this.iTextComponent.position.y.value = Object.top - this.parent.top;
-		this.iTextComponent.input.value = Object.text;
-		this.iTextComponent.fontSize.value = Object.fontSize;
-		this.iTextComponent.fontFamily.value = Object.fontFamily;
-		this.iTextComponent.align.value = Object.textAlign;
+		if (this.iTextComponent.name)
+			this.iTextComponent.name.value = Object.name;
+		if (this.iTextComponent.position.x)
+			this.iTextComponent.position.x.value = Object.left - this.parent.left;
+		if (this.iTextComponent.position.y)
+			this.iTextComponent.position.y.value = Object.top - this.parent.top;
+		if (this.iTextComponent.input)
+			this.iTextComponent.input.value = Object.text;
+		if (this.iTextComponent.fontSize)
+			this.iTextComponent.fontSize.value = Object.fontSize;
+		if (this.iTextComponent.fontFamilly)
+			this.iTextComponent.fontFamily.value = Object.fontFamily;
+		if (this.iTextComponent.align)
+			this.iTextComponent.align.value = Object.textAlign;
 		if (Object.fontWeight == "bold") {
-			this.iTextComponent.bold.checked = true;
+			if (this.iTextComponent.bold)
+				this.iTextComponent.bold.checked = true;
 		} else {
-			this.iTextComponent.bold.checked = false;
-
+			if (this.iTextComponent.bold)
+				this.iTextComponent.bold.checked = false;
 		}
 		if (Object.fontStyle == "italic") {
-			this.iTextComponent.italic.checked = true;
+			if (this.iTextComponent.italic)
+				this.iTextComponent.italic.checked = true;
 		} else {
-			this.iTextComponent.italic.checked = false;
-
+			if (this.iTextComponent.italic)
+				this.iTextComponent.italic.checked = false;
 		}
 		if (Object.underline) {
-			this.iTextComponent.underline.checked = true;
+			if (this.iTextComponent.underline)
+				this.iTextComponent.underline.checked = true;
 		} else {
-			this.iTextComponent.underline.checked = false;
+			if (this.iTextComponent.underline)
+				this.iTextComponent.underline.checked = false;
 		}
 
 	}
@@ -455,9 +483,10 @@ class Editor {
 		this.children = [];
 		dataChild.forEach(ch => {
 			if (ch.type == IMAGE_COMPONENT) {
-				this.addImage(ch.id, ch.data.src, ch.left, ch.top, ch.name, childControl)
+				this.addImage(ch.id, ch.data.src, ch.left, ch.top, ch.name, childControl, ch.data.scaleX, ch.data.scaleY)
 			} else if (ch.type == ITEXT_COMPONENT) {
-				this.addText(ch.id, ch.left, ch.top, ch.name, childControl);
+				this.addText(ch.id, ch.left, ch.top, ch.name, childControl,
+					ch.data.text, ch.data.fontSize, ch.data.fontFamily, ch.data.textAlign, ch.data.fontWeight, ch.data.fontStyle, ch.data.underline, ch.data.scaleX, ch.data.scaleY);
 
 			}
 		});
