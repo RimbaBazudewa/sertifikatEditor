@@ -14,6 +14,7 @@ const BOLD = "bold";
 const ITALIC = "italic";
 const UNDERLINE = "underline";
 class Editor {
+	canRemove = true;
 	isRightClick = false;
 	startRigthClick = { x: 0, y: 0 };
 	canvasPosition = { x: 0, y: 0 };
@@ -54,7 +55,8 @@ class Editor {
 		italic: null,
 		underline: null,
 	}
-	constructor(idCanvas, width, height) {
+	constructor(idCanvas, canRemove = true, width = 2480, height = 3508) {
+		this.canRemove = canRemove;
 		this.canvas = new fabric.Canvas(idCanvas, {
 			fireRightClick: true,  // <-- enable firing of right click events
 			fireMiddleClick: true, // <-- enable firing of middle click events
@@ -597,13 +599,16 @@ class Editor {
 			btnClick.onclick = function (e) { this.childClick(e) }.bind(this);
 			btnClick.appendChild(document.createTextNode(child.name));
 			btnGroup.appendChild(btnClick)
-			let btnClose = document.createElement("button");
-			btnClose.setAttribute("id", "child-object-close-" + child.id);
-			btnClose.setAttribute("data-id", child.id);
-			btnClose.setAttribute("class", "btn btn-danger " + activeClass);
-			btnClose.onclick = function (e) { this.childCloseClick(e) }.bind(this);
-			btnClose.appendChild(document.createTextNode("x"));
-			btnGroup.appendChild(btnClose)
+			if (this.canRemove) {
+				let btnClose = document.createElement("button");
+				btnClose.setAttribute("id", "child-object-close-" + child.id);
+				btnClose.setAttribute("data-id", child.id);
+				btnClose.setAttribute("class", "btn btn-danger " + activeClass);
+				btnClose.onclick = function (e) { this.childCloseClick(e) }.bind(this);
+				btnClose.appendChild(document.createTextNode("x"));
+				btnGroup.appendChild(btnClose)
+
+			}
 			this.elmentInspektor.appendChild(btnGroup);
 		});
 	}
